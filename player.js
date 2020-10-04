@@ -23,15 +23,44 @@
   h.appendChild(scr);
 })();
 
+(function () {
+  var h = document.head;
+  var scr = document.createElement('script');
+  scr.src =
+    'https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js';
+  h.appendChild(scr);
+})();
+
+/////////
+/////////
+
+function addTooltip(tooltip) {
+  $(tooltip.selector)
+    .attr({
+      title: 'overrided',
+    })
+    .tooltip({
+      content: tooltip.contents['#content'],
+      tooltipClass: tooltip.classes,
+    });
+}
+
 //load the json guide
 $.ajax({
   dataType: 'jsonp',
   url:
     'https://guidedlearning.oracle.com/player/latest/api/scenario/get/v_IlPvRLRWObwLnV5sTOaw/5szm2kaj/?callback=__5szm2kaj&refresh=true&env=dev&type=startPanel&vars%5Btype%5D=startPanel&sid=none&_=1582203987867',
   success: function (data) {
-    var steps = data.data.structure.steps;
+    let steps = data.data.structure.steps;
     steps.forEach((step) => {
-      console.log(step);
+      switch (step.action.type) {
+        case 'tip':
+          return addTooltip(step.action);
+        case 'closeScenario':
+          return console.log('closeScenario');
+        default:
+          return;
+      }
     });
   },
 });
