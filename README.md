@@ -2,6 +2,10 @@
 
 guided learning solution for google.com
 
+## Visuals
+
+<img src="https://github.com/Torend/Google-GLS/blob/main/GLS.gif" width="85%"/>
+
 ### Installation
 
 requires [Python](https://www.python.org/) 3.x+ to run.
