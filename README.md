@@ -38,10 +38,10 @@ document.head.appendChild(script);
 ```
 
 use the test functions:
-showAll() - show all tooltips
-hideAll() - hide all tooltips
-showById(id) - show specific tooltip (by id)
-getPositions() - print positions of the tooltips and the elements that belong to them
+- showAll() - show all tooltips
+- hideAll() - hide all tooltips
+- showById(id) - show specific tooltip (by id)
+- getPositions() - print positions of the tooltips and the elements that belong to them
 
 ### Comments
 
