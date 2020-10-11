@@ -31,27 +31,36 @@ String.prototype.insert = function (index, string) {
   return string + this;
 };
 
+// get html as a string and insert the value to specific class
 function htmlEditor(html, className, value) {
   let index = html.search(className) + className.length + 2;
   return html.insert(index, value);
 }
 
-function pressClose(tooltip) {
-  $(tooltip).tooltip('close');
+function pressClose(helement) {
+  $(helement).last().tooltip('close');
 }
 
 function pressNext(next, curr) {
   $('[title=id-' + next + ']').tooltip('open');
-  $(curr).tooltip('close');
+  $(curr).last().tooltip('close');
 }
 
 function pressBack(back, curr) {
   // not working for all (step.id numbers are not following)
   $('[title=id-' + back + ']').tooltip('open');
-  $(curr).tooltip('close');
+  $(curr).last().tooltip('close');
+}
+
+function pressRemindMeLater(helement, inteval) {
+  $(helement).last().tooltip('close');
+  return window.setTimeout(function () {
+    $(helement).last().tooltip('open');
+  }, parseInt(inteval));
 }
 
 function addTooltip(step, tip_html, numbersOfSteps) {
+  // chagne the given html (tiplates.tip)
   tip_html = htmlEditor(tip_html, 'stepCount', step.action.stepOrdinal);
   tip_html = htmlEditor(tip_html, 'stepsCount', numbersOfSteps);
   tip_html = htmlEditor(
@@ -82,8 +91,32 @@ function addTooltip(step, tip_html, numbersOfSteps) {
     'prevB',
     ' onClick="pressBack(\'' + (step.id - 1) + "', '" + fixedSelector + '\')" '
   );
-  // console.log(tip_html);
-  $(step.action.selector)
+  tip_html = htmlEditor(
+    tip_html,
+    'laterB',
+    ' onClick="pressRemindMeLater(\'' +
+      fixedSelector +
+      "', '" +
+      step.action.warningTimeout +
+      '\')" '
+  );
+
+  if (Object.keys(step.action.roleTexts).length > 0) {
+    for (key in step.action.roleTexts) {
+      let index = tip_html.search('data-iridize-role=' + '"' + key + '"'); //assumed roleTexts is a data-iridize-role
+      let sub = tip_html.substring(index);
+      start = sub.search('>') + index + 1;
+      end = sub.search('<') + index;
+      tip_html =
+        tip_html.substring(0, start) +
+        step.action.roleTexts[key] +
+        tip_html.substring(end);
+    }
+  }
+
+  //add the the tooltip for the specfic helement
+  const helement = $(step.action.selector).last();
+  helement
     .attr({
       title: 'id-' + step.id,
     })
@@ -94,10 +127,10 @@ function addTooltip(step, tip_html, numbersOfSteps) {
       position: {
         // my: step.action.placement,
         at: step.action.placement,
-        of: step.action.selector,
+        of: helement,
         collision: 'fit',
       },
-      hide: { delay: step.action.warningTimeout, effect: 'slide' },
+      hide: { delay: step.action.wdInterval * 2, effect: 'slide' },
     });
 }
 
@@ -126,7 +159,9 @@ function main() {
             return addTooltip(step, json.data.tiplates.tip, numbersOfSteps);
           case 'closeScenario':
             // $('.ui-helper-hidden-accessible').remove();
-            $('[title=id-1]').tooltip('open');
+            window.setTimeout(function () {
+              $('[title=id-1]').tooltip('open');
+            }, 1000);
             return;
           default:
             return;
